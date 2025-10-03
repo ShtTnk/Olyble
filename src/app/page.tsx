@@ -59,6 +59,7 @@ export default function Home() {
   const [balls, setBalls] = useState<Particle[]>([]);
   const goalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const [loading, setLoading] = useState(true); // ← ローディング用の state
 
   const shootBall = () => {
     if (!buttonRef.current) return;
@@ -76,12 +77,24 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch("/api/nextEvent");
-      const data = await res.json();
-      setEvents(data.events);
+      const startTime = Date.now();
+      try {
+        const res = await fetch("/api/nextEvent");
+        const data = await res.json();
+        setEvents(data.events);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        // 1秒は必ずローディングを表示
+        const elapsed = Date.now() - startTime;
+        const minDuration = 1000; // ms
+        const remaining = Math.max(minDuration - elapsed, 0);
+        setTimeout(() => setLoading(false), remaining);
+      }
     };
     fetchData();
   }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -104,10 +117,23 @@ export default function Home() {
           </h1>
           {/* ここに呼び出す */}
           <div className="max-w-md mx-auto mt-10">
-            <h1 className="text-2xl font-bold mb-5">
+            <h2 className="text-2xl font-bold mb-5">
               オリブルFCの次のイベント
-            </h1>
-            <EventList events={events} />
+            </h2>
+            {loading ? (
+              <div className="flex flex-col items-center gap-4">
+                <motion.img
+                  src="/soccerball.jpg"
+                  alt="ロード中ボール"
+                  className="w-16 h-16 rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                />
+                <p className="text-gray-600">予定を取得中…</p>
+              </div>
+            ) : (
+              <EventList events={events} />
+            )}
           </div>
           <a href="https://labola.jp/r/shop/3274/calendar_week/">
             <p className="text-center sm:text-left text-lg sm:text-xl max-w-[700px] leading-6 sm:leading-7 underline hover:no-underline">
