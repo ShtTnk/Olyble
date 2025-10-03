@@ -64,7 +64,7 @@ export async function fetchEvents(): Promise<Event[]> {
   const [month, day] = firstTh.match(/\d+/g)!.map(Number); // ex: "10/5(日)" -> [10,5]
   const year = new Date().getFullYear();
 
-  for (const i = 0; i < NUM_WEEKS; i++) {
+  for (let i = 0; i < NUM_WEEKS; i++) {
     const url =
       i === 0
         ? baseUrl
@@ -74,7 +74,7 @@ export async function fetchEvents(): Promise<Event[]> {
     const htmlWeek = await resWeek.text();
     const $week = cheerio.load(htmlWeek);
 
-    const currentDate = "";
+    let currentDate = "";
 
     $week("tr.spaces").each((_, tr) => {
       const th = $week(tr).find("th.day");
