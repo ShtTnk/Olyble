@@ -60,6 +60,16 @@ export default function Home() {
   const goalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [loading, setLoading] = useState(true); // ← ローディング用の state
+  const [goalCount, setGoalCount] = useState(0); // ← ゴール数 state
+  const rainbowColors = [
+    "text-red-500",
+    "text-orange-400",
+    "text-yellow-300",
+    "text-green-400",
+    "text-blue-500",
+    "text-indigo-500",
+    "text-purple-500",
+  ]; // 虹色クラスの配列
 
   const shootBall = () => {
     if (!buttonRef.current) return;
@@ -73,6 +83,9 @@ export default function Home() {
       duration: 1, // アニメーションの時間（秒）
     };
     setBalls((prev) => [...prev, newBall]);
+
+    // 🎯 ボタンクリックでゴール数カウントアップ
+    setGoalCount((prev) => prev + 1);
   };
 
   useEffect(() => {
@@ -85,15 +98,16 @@ export default function Home() {
       } catch (err) {
         console.error(err);
       } finally {
-        // 1秒は必ずローディングを表示
+        // 1.5秒は必ずローディングを表示
         const elapsed = Date.now() - startTime;
-        const minDuration = 1000; // ms
+        const minDuration = 1500; // ms
         const remaining = Math.max(minDuration - elapsed, 0);
         setTimeout(() => setLoading(false), remaining);
       }
     };
     fetchData();
   }, []);
+  const text = " Welcome  to  Olyble  FC  Home !";
 
   return (
     <motion.div
@@ -112,62 +126,69 @@ export default function Home() {
             height={38}
             priority
           />
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-center sm:text-left max-w-[700px] leading-[1.1]">
-            Welcome to Olyble FC Home!
-          </h1>
-          {/* ここに呼び出す */}
+            {/* 🌈 左から順に虹色表示タイトル */}
+            <h1 className="text-4xl sm:text-5xl font-extrabold flex flex-wrap gap-1 mb-10">
+              {text.split("").map((char, index) => (
+                <motion.span
+                  key={index}
+                  className={rainbowColors[index % rainbowColors.length]}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: index * 0.05,
+                    duration: 0.4,
+                    ease: "easeOut",
+                  }}
+                >
+                  {char}
+                </motion.span>
+              ))}
+            </h1>
           <div className="max-w-md mx-auto mt-10">
             <h2 className="text-2xl font-bold mb-5">
               オリブルFCの次のイベント
             </h2>
             {loading ? (
-              <div className="flex flex-col items-center gap-4">
-                <motion.img
-                  src="/soccerball.jpg"
-                  alt="ロード中ボール"
-                  className="w-16 h-16 rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                />
-                <p className="text-gray-600">予定を取得中…</p>
+              <div className="flex flex-col items-center justify-center">
+                <p className="text-white mb-6 text-lg">⌛ 予定を取得中… ⌛</p>
+                <div className="flex items-center gap-10 justify-center">
+                  {/* サッカーボール */}
+                  <motion.img
+                    src="/soccerball.jpg"
+                    alt="サッカーボール"
+                    className="w-24 h-24 rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3,
+                      ease: "linear",
+                    }}
+                  />
+                  {/* ゴール */}
+                  <motion.img
+                    src="/soccer_goal.png"
+                    alt="サッカーゴール"
+                    className="w-32 h-32 object-contain"
+                    animate={{ rotate: -360 }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 3,
+                      ease: "linear",
+                    }}
+                  />
+                </div>
               </div>
             ) : (
               <EventList events={events} />
             )}
           </div>
-          <a href="https://labola.jp/r/shop/3274/calendar_week/">
-            <p className="text-center sm:text-left text-lg sm:text-xl max-w-[700px] leading-6 sm:leading-7 underline hover:no-underline">
-              フットサルコート予約カレンダーはこちら。
-            </p>
-          </a>
-          <iframe
-            src="https://labola.jp/r/shop/3274/calendar_week/"
-            width="100%"
-            height="600"
-            frameBorder="0"
-            scrolling="auto"
-            title="フットサル予約カレンダー"
-          />
-          {/* <iframe
-          src="https://park-kameoka.jp/yoyaku/day?id=11"
-          width="100%"
-          height="600"
-          frameBorder="0"
-          scrolling="auto"
-          title="テニス予約カレンダー"
-        /> */}
-          <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-            <li className="mb-2 tracking-[-.01em]">
-              ⚽ Olyble Football Club ⚽
-              <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded"></code>
-            </li>
-            <li className="tracking-[-.01em]">
-              We definitely love football and welcome everyone who loves
-              football.
-            </li>
-          </ol>
 
-          <div className="flex items-center gap-30 justify-end mt-10 w-full max-w-md mx-auto">
+          {/* ゴール数の表示 */}
+          <p className="text-white text-2xl font-bold mb-4">
+            ゴール数: {goalCount}
+          </p>
+
+          <div className="flex items-center gap-30 justify-end w-full max-w-md mx-auto">
             <button
               ref={buttonRef} // ← ここ大事
               className="
@@ -193,6 +214,29 @@ export default function Home() {
               />
             </div>
           </div>
+          <a href="https://labola.jp/r/shop/3274/calendar_week/">
+            <p className="text-center sm:text-left text-lg sm:text-xl max-w-[700px] leading-6 sm:leading-7 underline hover:no-underline">
+              フットサルコート予約カレンダーはこちら。
+            </p>
+          </a>
+          <iframe
+            src="https://labola.jp/r/shop/3274/calendar_week/"
+            width="100%"
+            height="600"
+            frameBorder="0"
+            scrolling="auto"
+            title="フットサル予約カレンダー"
+          />
+          <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
+            <li className="mb-2 tracking-[-.01em]">
+              ⚽ Olyble Football Club ⚽
+              <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded"></code>
+            </li>
+            <li className="tracking-[-.01em]">
+              💛 We definitely love football and welcome everyone who loves
+              football 💛.
+            </li>
+          </ol>
         </main>
         <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center text-gray-300">
           <a href="#" className="flex items-center gap-2 hover:underline">
