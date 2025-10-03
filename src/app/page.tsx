@@ -1,7 +1,44 @@
+'use client';
+import { motion } from "framer-motion";
 import Image from "next/image";
+import NextEvent from "@/app/components/NextEvent"; // 👈 import
+import { use, useEffect, useState } from "react";
+
+import { supabase } from "@/app/lib/supabaseClient";
+
+const NUM_PARTICLES = 20
+
+// -------------------------------パーティクル用----------------------------
+function random(min: number, max: number) {
+  return Math.random() * (max - min) + min
+}
+
+function Particle() {
+  const size = random(10, 30)
+  const top = random(0, 100)
+  const left = random(0, 100)
+  const animX = random(-50, 50)
+  const animY = random(-50, 50)
+  const duration = random(3, 8)
+
+  return (
+    <motion.div
+      className="absolute bg-white rounded-full"
+      style={{ width: size, height: size, top: `${top}%`, left: `${left}%` }}
+      animate={{ x: [0, animX, 0], y: [0, animY, 0], opacity: [0.5, 1, 0.5] }}
+      transition={{ duration, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
+    />
+  )
+}
 
 export default function Home() {
   return (
+    <motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ duration: 1.2, ease: 'easeInOut' }}
+  className="absolute inset-0 flex flex-col items-center justify-center text-white"
+>
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image
@@ -12,6 +49,32 @@ export default function Home() {
           height={38}
           priority
         />
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-center sm:text-left max-w-[700px] leading-[1.1]">
+          Welcome to Olyble Home!
+        </h1>
+                  {/* ここに呼び出す */}
+          <NextEvent />
+        <a href="https://labola.jp/r/shop/3274/calendar_week/">
+          <p className="text-center sm:text-left text-lg sm:text-xl max-w-[700px] leading-6 sm:leading-7 underline hover:no-underline">
+            フットサルコート予約カレンダーはこちら。
+          </p>
+        </a>
+        <iframe
+          src="https://labola.jp/r/shop/3274/calendar_week/"
+          width="100%"
+          height="600"
+          frameBorder="0"
+          scrolling="auto"
+          title="フットサル予約カレンダー"
+        />
+        {/* <iframe
+          src="https://park-kameoka.jp/yoyaku/day?id=11"
+          width="100%"
+          height="600"
+          frameBorder="0"
+          scrolling="auto"
+          title="テニス予約カレンダー"
+        /> */}
         <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}
@@ -99,5 +162,6 @@ export default function Home() {
         </a>
       </footer>
     </div>
+    </motion.div>
   );
 }
