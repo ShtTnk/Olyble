@@ -241,7 +241,7 @@ export default function Home() {
 
             {/* ゴール */}
             <div ref={goalRef} className="w-24 h-24">
-              <img
+              <Image
                 src="/soccer_goal.png"
                 className="w-full h-full object-contain"
                 alt="ゴール"
@@ -339,7 +339,7 @@ export default function Home() {
             animate={{ x: deltaX, y: deltaY, rotate: 720, opacity: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
-            <img src="/soccerball.jpg" className="w-full h-full object-cover" />
+            <Image src="/soccerball.jpg" className="w-full h-full object-cover" alt="サッカーボール"/>
           </motion.div>
         );
       })}
