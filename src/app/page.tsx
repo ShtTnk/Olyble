@@ -62,11 +62,13 @@ export default function Home() {
   const shootBall = () => {
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
-    const newBall: Ball = {
+    const newBall: Particle = {
       id: Date.now(),
       size: 40,
-      x: rect.left + rect.width / 2, // 初期X
-      y: rect.top + rect.height / 2, // 初期Y
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      rotate: 0, // 初期回転
+      duration: 1, // アニメーションの時間（秒）
     };
     setBalls((prev) => [...prev, newBall]);
   };
@@ -101,7 +103,9 @@ export default function Home() {
           </h1>
           {/* ここに呼び出す */}
           <div className="max-w-md mx-auto mt-10">
-            <h1 className="text-2xl font-bold mb-5">オリブルFCの次のイベント</h1>
+            <h1 className="text-2xl font-bold mb-5">
+              オリブルFCの次のイベント
+            </h1>
             <EventList events={events} />
           </div>
           <a href="https://labola.jp/r/shop/3274/calendar_week/">
