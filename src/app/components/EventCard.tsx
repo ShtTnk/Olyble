@@ -4,6 +4,13 @@ const dayColors: Record<string, string> = {
   "日": "bg-red-700",
 };
 
+type Event = {
+  id: number;
+  title: string;
+  description: string;
+  date: string; // ← 追加
+};
+
 interface EventCardProps {
   event: Event;
   index: number;

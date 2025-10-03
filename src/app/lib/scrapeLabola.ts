@@ -42,6 +42,7 @@
 import * as cheerio from 'cheerio';
 
 export type Event = {
+  id: number;
   name: string;
   date: string;
   time: string;
@@ -89,6 +90,7 @@ export async function fetchEvents(): Promise<Event[]> {
           if (text.includes("オリブルFC")) {
             const timeMatch = text.match(/\d{2}:\d{2}-\d{2}:\d{2}/);
             allEvents.push({
+              id: Date.now() + allEvents.length, // 適当な一意ID
               name: "オリブルFC",
               date: currentDate,
               time: timeMatch ? timeMatch[0] : "",
