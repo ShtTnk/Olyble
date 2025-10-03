@@ -7,6 +7,7 @@ import type { Event } from "@/app/lib/scrapeLabola";
 import { use, useEffect, useState, useRef } from "react";
 import { SoccerBallRain } from "./components/SoccerBallRain";
 import { supabase } from "@/app/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 // -------------------------------パーティクル用----------------------------
 const NUM_PARTICLES = 20;
@@ -70,6 +71,7 @@ export default function Home() {
     "text-indigo-500",
     "text-purple-500",
   ]; // 虹色クラスの配列
+  const router = useRouter(); // ← ルーター 画面遷移のため
 
   const shootBall = () => {
     if (!buttonRef.current) return;
