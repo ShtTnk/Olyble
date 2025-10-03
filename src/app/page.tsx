@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import NextEvent from "@/app/components/NextEvent"; // 👈 import
 import { EventList } from "@/app/components/EventList";
+import type { Event } from "@/app/lib/scrapeLabola";
 import { use, useEffect, useState, useRef } from "react";
 import { SoccerBallRain } from "./components/SoccerBallRain";
 import { supabase } from "@/app/lib/supabaseClient";
