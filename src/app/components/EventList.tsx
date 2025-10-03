@@ -1,4 +1,5 @@
-import { EventCard, getColorForDate } from "./EventCard";
+// 修正後
+import { EventCard } from "./EventCard";
 import type { Event } from "@/app/lib/scrapeLabola";
 
 export function EventList({ events }: { events: Event[] }) {
