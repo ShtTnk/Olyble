@@ -2,6 +2,19 @@
 
 import type { Event } from "@/app/lib/scrapeLabola"; // Event型は既存のやつ使う
 
+const dateColors = ["bg-red-100", "bg-green-100", "bg-blue-100", "bg-yellow-100", "bg-purple-100"];
+
+const dateColorMap: Record<string, string> = {};
+let colorIndex = 0;
+
+function getColorForDate(date: string) {
+  if (!dateColorMap[date]) {
+    dateColorMap[date] = dateColors[colorIndex % dateColors.length];
+    colorIndex++;
+  }
+  return dateColorMap[date];
+}
+
 interface EventCardProps {
   event: Event;
   index: number;
