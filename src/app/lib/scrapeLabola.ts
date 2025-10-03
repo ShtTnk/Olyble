@@ -13,7 +13,7 @@
 //   const $ = cheerio.load(html);
 
 //   const events: Event[] = [];
-//   let currentDate = '';
+//   const currentDate = '';
 
 //   $('tr.spaces').each((_, tr) => {
 //     const th = $(tr).find('th.day');
@@ -61,10 +61,10 @@ export async function fetchEvents(): Promise<Event[]> {
 
   // 今週の開始日を取得
   const firstTh = $("tr.spaces th.day").first().text().trim();
-  let [month, day] = firstTh.match(/\d+/g)!.map(Number); // ex: "10/5(日)" -> [10,5]
-  let year = new Date().getFullYear();
+  const [month, day] = firstTh.match(/\d+/g)!.map(Number); // ex: "10/5(日)" -> [10,5]
+  const year = new Date().getFullYear();
 
-  for (let i = 0; i < NUM_WEEKS; i++) {
+  for (const i = 0; i < NUM_WEEKS; i++) {
     const url =
       i === 0
         ? baseUrl
@@ -74,7 +74,7 @@ export async function fetchEvents(): Promise<Event[]> {
     const htmlWeek = await resWeek.text();
     const $week = cheerio.load(htmlWeek);
 
-    let currentDate = "";
+    const currentDate = "";
 
     $week("tr.spaces").each((_, tr) => {
       const th = $week(tr).find("th.day");

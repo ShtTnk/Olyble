@@ -9,7 +9,7 @@ const dateColors = [
 export function EventList({ events }: { events: Event[] }) {
   // 日付ごとに色を決めるマップ
   const dateColorMap: Record<string, string> = {};
-  let colorIndex = 0;
+  const colorIndex = 0;
 
   events.forEach((event) => {
     if (!dateColorMap[event.date]) {
