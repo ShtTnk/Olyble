@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import NextEvent from "@/app/components/NextEvent"; // 👈 import
 import { EventList } from "@/app/components/EventList";
@@ -72,6 +72,8 @@ export default function Home() {
     "text-purple-500",
   ]; // 虹色クラスの配列
   const router = useRouter(); // ← ルーター 画面遷移のため
+  const [images, setImages] = useState<string[]>([]);
+  const [current, setCurrent] = useState(0);
 
   const shootBall = () => {
     if (!buttonRef.current) return;
@@ -90,6 +92,7 @@ export default function Home() {
     setGoalCount((prev) => prev + 1);
   };
 
+  // 予定一覧取得
   useEffect(() => {
     const fetchData = async () => {
       const startTime = Date.now();
@@ -109,6 +112,35 @@ export default function Home() {
     };
     fetchData();
   }, []);
+
+  // APIから画像一覧を取得
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const res = await fetch("/api/getAlbum");
+        const data = await res.json();
+        if (data.images) setImages(data.images);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchImages();
+  }, []);
+
+  // 画像スライドショー用
+  useEffect(() => {
+    if (images.length === 0) return;
+
+    // 3秒ごとに画像切り替え
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [images]);
+
+  // タイトルテキスト
   const text = " Welcome  to  Olyble  FC  Home !";
 
   return (
@@ -128,24 +160,24 @@ export default function Home() {
             height={38}
             priority
           />
-            {/* 🌈 左から順に虹色表示タイトル */}
-            <h1 className="text-4xl sm:text-5xl font-extrabold flex flex-wrap gap-1 mb-10">
-              {text.split("").map((char, index) => (
-                <motion.span
-                  key={index}
-                  className={rainbowColors[index % rainbowColors.length]}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: index * 0.05,
-                    duration: 0.4,
-                    ease: "easeOut",
-                  }}
-                >
-                  {char}
-                </motion.span>
-              ))}
-            </h1>
+          {/* 🌈 左から順に虹色表示タイトル */}
+          <h1 className="text-4xl sm:text-5xl font-extrabold flex flex-wrap gap-1 mb-10">
+            {text.split("").map((char, index) => (
+              <motion.span
+                key={index}
+                className={rainbowColors[index % rainbowColors.length]}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: index * 0.05,
+                  duration: 0.4,
+                  ease: "easeOut",
+                }}
+              >
+                {char}
+              </motion.span>
+            ))}
+          </h1>
           <div className="max-w-md mx-auto mt-10">
             <h2 className="text-2xl font-bold mb-5">
               オリブルFCの次のイベント
@@ -229,6 +261,37 @@ export default function Home() {
             scrolling="auto"
             title="フットサル予約カレンダー"
           />
+          <div className="relative w-full max-w-3xl h-[400px] mx-auto overflow-hidden rounded-2xl shadow-lg">
+            {images.length > 0 && (
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={images[current]}
+                  src={images[current]}
+                  alt="photo"
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -100 }}
+                  transition={{ duration: 0.8 }}
+                  className="absolute w-full h-full object-cover"
+                />
+              </AnimatePresence>
+            )}
+          </div>
+          <button
+            onClick={() => router.push("/upload-page")}
+            className="                
+                px-6 py-3 
+                bg-white dark:bg-gray-800 
+                text-black dark:text-white 
+                border-2 border-black dark:border-white 
+                rounded-full 
+                hover:bg-gray-200 dark:hover:bg-gray-700 
+                transition
+                shadow-md"
+          >
+            写真アップロードページへ
+          </button>
+
           <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
             <li className="mb-2 tracking-[-.01em]">
               ⚽ Olyble Football Club ⚽

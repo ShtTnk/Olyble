@@ -1,17 +1,19 @@
+// src/app/api/getAlbum/route.ts
 import { supabase } from "@/app/lib/supabaseClient";
 
 export async function GET() {
-  // DBからphotosを取得
-  const { data: photos, error } = await supabase
-    .from("photos")
-    .select("file_path");
+  // photosバケットからファイル一覧を取得
+  const { data: files, error } = await supabase.storage.from("photos").list();
 
-  if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  if (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
 
-  // Storageの公開URLを作る
-  const urls = photos.map(photo => 
-    supabase.storage.from("album").getPublicUrl(photo.file_path).data.publicUrl
-  );
+  // 公開 URL を生成
+const urls = files.map(file => {
+  const { data } = supabase.storage.from("photos").getPublicUrl(file.name);
+  return data.publicUrl;
+});
 
   return new Response(JSON.stringify({ images: urls }), { status: 200 });
 }
