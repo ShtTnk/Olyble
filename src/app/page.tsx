@@ -1,17 +1,11 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import NextEvent from "@/app/components/NextEvent"; // 👈 import
 import { EventList } from "@/app/components/EventList";
 import type { Event } from "@/app/lib/scrapeLabola";
-import { use, useEffect, useState, useRef } from "react";
-import { SoccerBallRain } from "./components/SoccerBallRain";
-import { supabase } from "@/app/lib/supabaseClient";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { div } from "framer-motion/client";
 
-// -------------------------------パーティクル用----------------------------
-const NUM_PARTICLES = 20;
 type Particle = {
   id: number;
   size: number;
@@ -21,48 +15,13 @@ type Particle = {
   duration: number;
 };
 
-type Ball = {
-  id: number;
-  size: number;
-  x: number;
-  y: number;
-};
-
-// -------------------------------パーティクル用----------------------------
-function random(min: number, max: number) {
-  return Math.random() * (max - min) + min;
-}
-
-function Particle() {
-  const size = random(10, 30);
-  const top = random(0, 100);
-  const left = random(0, 100);
-  const animX = random(-50, 50);
-  const animY = random(-50, 50);
-  const duration = random(3, 8);
-
-  return (
-    <motion.div
-      className="absolute bg-white rounded-full"
-      style={{ width: size, height: size, top: `${top}%`, left: `${left}%` }}
-      animate={{ x: [0, animX, 0], y: [0, animY, 0], opacity: [0.5, 1, 0.5] }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        repeatType: "mirror",
-        ease: "easeInOut",
-      }}
-    />
-  );
-}
-
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [balls, setBalls] = useState<Particle[]>([]);
   const goalRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-  const [loading, setLoading] = useState(true); // ← ローディング用の state
-  const [goalCount, setGoalCount] = useState(0); // ← ゴール数 state
+  const [loading, setLoading] = useState(true);
+  const [goalCount, setGoalCount] = useState(0);
   const rainbowColors = [
     "text-red-500",
     "text-orange-400",
@@ -71,8 +30,8 @@ export default function Home() {
     "text-blue-500",
     "text-indigo-500",
     "text-purple-500",
-  ]; // 虹色クラスの配列
-  const router = useRouter(); // ← ルーター 画面遷移のため
+  ];
+  const router = useRouter();
   const [images, setImages] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
 
@@ -84,19 +43,17 @@ export default function Home() {
       size: 40,
       x: rect.left + rect.width / 2,
       y: rect.top + rect.height / 2,
-      rotate: 0, // 初期回転
-      duration: 1, // アニメーションの時間（秒）
+      rotate: 0,
+      duration: 1,
     };
     setBalls((prev) => [...prev, newBall]);
-
-    // 🎯 ボタンクリックでゴール数カウントアップ
     setGoalCount((prev) => prev + 1);
   };
 
-  // 予定一覧取得
+  // 予定取得
   useEffect(() => {
     const fetchData = async () => {
-      const startTime = Date.now();
+      const start = Date.now();
       try {
         const res = await fetch("/api/nextEvent");
         const data = await res.json();
@@ -104,17 +61,14 @@ export default function Home() {
       } catch (err) {
         console.error(err);
       } finally {
-        // 1.5秒は必ずローディングを表示
-        const elapsed = Date.now() - startTime;
-        const minDuration = 1500; // ms
-        const remaining = Math.max(minDuration - elapsed, 0);
-        setTimeout(() => setLoading(false), remaining);
+        const elapsed = Date.now() - start;
+        setTimeout(() => setLoading(false), Math.max(1500 - elapsed, 0));
       }
     };
     fetchData();
   }, []);
 
-  // APIから画像一覧を取得
+  // 画像取得
   useEffect(() => {
     const fetchImages = async () => {
       try {
@@ -125,34 +79,29 @@ export default function Home() {
         console.error(err);
       }
     };
-
     fetchImages();
   }, []);
 
-  // 画像スライドショー用
+  // 画像スライドショー
   useEffect(() => {
-    if (images.length === 0) return;
-
-    // 3秒ごとに画像切り替え
+    if (!images.length) return;
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 3000);
-
     return () => clearInterval(interval);
   }, [images]);
 
-  // タイトルテキストを配列でまとめる
   const titleParts = ["We", "are", "Olyble FC!"];
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1.2, ease: "easeInOut" }}
-      className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black"
+      transition={{ duration: 1.2 }}
+      className="w-full min-h-screen flex flex-col items-center justify-center text-white bg-black overflow-x-hidden"
     >
-      <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-        <main className="flex flex-col gap-[32px] row-start-2 items-center">
+      <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen w-full p-4 sm:p-8 gap-8">
+        <main className="flex flex-col gap-8 row-start-2 items-center w-full max-w-screen-md">
           <Image
             className="dark:invert"
             src="/next.svg"
@@ -161,20 +110,14 @@ export default function Home() {
             height={38}
             priority
           />
-          {/* 🌈 左から順に虹色表示タイトル */}
-          {/* 🌈 虹色アニメーションタイトル */}
-          <h1 className="text-4xl sm:text-5xl font-extrabold flex flex-wrap gap-3 mb-10">
+          <h1 className="text-3xl sm:text-5xl font-extrabold flex flex-wrap gap-2 sm:gap-3 mb-8 text-center">
             {titleParts.map((word, wordIndex) => (
               <motion.span
                 key={wordIndex}
                 className="flex"
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: wordIndex * 0.4, // 単語ごとに少し遅らせる
-                  duration: 0.6,
-                  ease: "easeOut",
-                }}
+                transition={{ delay: wordIndex * 0.4, duration: 0.6 }}
               >
                 {word.split("").map((char, charIndex) => (
                   <motion.span
@@ -184,12 +127,11 @@ export default function Home() {
                         (wordIndex * 3 + charIndex) % rainbowColors.length
                       ]
                     }
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
                       delay: wordIndex * 0.4 + charIndex * 0.05,
                       duration: 0.4,
-                      ease: "easeOut",
                     }}
                   >
                     {char}
@@ -199,37 +141,27 @@ export default function Home() {
             ))}
           </h1>
 
-          <div className="max-w-md mx-auto mt-10">
-            <h2 className="text-2xl font-bold mb-5">
+          <div className="w-full max-w-md mx-auto">
+            <h2 className="text-xl sm:text-2xl font-bold mb-4">
               オリブルFCの次のイベント
             </h2>
             {loading ? (
-              <div className="flex flex-col items-center justify-center">
-                <p className="text-white mb-6 text-lg">⌛ 予定を取得中… ⌛</p>
-                <div className="flex items-center gap-10 justify-center">
-                  {/* サッカーボール */}
+              <div className="flex flex-col items-center justify-center gap-4">
+                <p className="text-white text-lg">⌛ 予定を取得中… ⌛</p>
+                <div className="flex items-center gap-6 justify-center">
                   <motion.img
                     src="/soccerball.jpg"
                     alt="サッカーボール"
-                    className="w-24 h-24 rounded-full"
+                    className="w-16 sm:w-24 h-16 sm:h-24 rounded-full"
                     animate={{ rotate: 360 }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 3,
-                      ease: "linear",
-                    }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
                   />
-                  {/* ゴール */}
                   <motion.img
                     src="/soccer_goal.png"
                     alt="サッカーゴール"
-                    className="w-32 h-32 object-contain"
+                    className="w-20 sm:w-32 h-20 sm:h-32 object-contain"
                     animate={{ rotate: -360 }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 3,
-                      ease: "linear",
-                    }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
                   />
                 </div>
               </div>
@@ -238,30 +170,19 @@ export default function Home() {
             )}
           </div>
 
-          {/* ゴール数の表示 */}
-          <p className="text-white text-2xl font-bold mb-4">
+          <p className="text-white text-xl sm:text-2xl font-bold mb-4 text-center">
             ゴラッソカウンター: {goalCount}
           </p>
 
-          <div className="flex items-center gap-30 justify-end w-full max-w-md mx-auto">
+          <div className="flex flex-wrap gap-4 sm:gap-8 justify-center items-center w-full max-w-md mx-auto">
             <button
-              ref={buttonRef} // ← ここ大事
-              className="
-                px-6 py-3 
-                bg-white dark:bg-gray-800 
-                text-black dark:text-white
-                border-2 border-black dark:border-white 
-                rounded-full 
-                hover:bg-gray-200 dark:hover:bg-gray-700 
-                transition
-                shadow-md"
+              ref={buttonRef}
               onClick={shootBall}
+              className="px-6 py-3 bg-white dark:bg-gray-800 text-black dark:text-white border-2 border-black dark:border-white rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition shadow-md"
             >
               ⚽ Shoooooooooot！
             </button>
-
-            {/* ゴール */}
-            <div ref={goalRef} className="w-24 h-24">
+            <div ref={goalRef} className="w-20 sm:w-24 h-20 sm:h-24">
               <img
                 src="/soccer_goal.png"
                 className="w-full h-full object-contain"
@@ -269,85 +190,70 @@ export default function Home() {
               />
             </div>
           </div>
-          <a href="https://labola.jp/r/shop/3274/calendar_week/">
-            <p className="text-center sm:text-left text-lg sm:text-xl max-w-[700px] leading-6 sm:leading-7 underline hover:no-underline">
-              フットサルコート予約カレンダーはこちら。
-            </p>
+
+          <a
+            href="https://labola.jp/r/shop/3274/calendar_week/"
+            className="text-center sm:text-left text-lg sm:text-xl max-w-full leading-6 sm:leading-7 underline hover:no-underline mt-6 block"
+          >
+            フットサルコート予約カレンダーはこちら。
           </a>
+
           <iframe
             src="https://labola.jp/r/shop/3274/calendar_week/"
             width="100%"
-            height="600"
+            height="400"
+            className="sm:h-[600px]"
             frameBorder="0"
             scrolling="auto"
             title="フットサル予約カレンダー"
           />
-          <p className="text-center text-lg sm:text-xl max-w-[700px] leading-6 sm:leading-7 text-yellow-300">
+
+          <p className="text-center text-lg sm:text-xl text-yellow-300 mt-4">
             📸 オリブルFC所属選手 📸
           </p>
-          <div className="relative w-full max-w-3xl h-[400px] mx-auto overflow-hidden rounded-2xl shadow-lg">
+
+          <div className="relative w-full max-w-3xl h-[300px] sm:h-[400px] mx-auto overflow-hidden rounded-2xl shadow-lg">
             {images.length > 0 && (
               <AnimatePresence mode="wait">
                 <motion.img
                   key={images[current]}
                   src={images[current]}
                   alt="photo"
-                  initial={{ opacity: 0, x: 100 }}
+                  initial={{ opacity: 0, x: 50 }}
                   animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -100 }}
-                  transition={{ duration: 3.0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 2 }}
                   className="absolute w-full h-full object-cover"
                 />
               </AnimatePresence>
             )}
           </div>
+
           <button
             onClick={() => router.push("/upload-page")}
-            className="                
-                px-6 py-3 
-                bg-white dark:bg-gray-800 
-                text-black dark:text-white 
-                border-2 border-black dark:border-white 
-                rounded-full 
-                hover:bg-gray-200 dark:hover:bg-gray-700 
-                transition
-                shadow-md"
+            className="mt-4 px-6 py-3 bg-white dark:bg-gray-800 text-black dark:text-white border-2 border-black dark:border-white rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition shadow-md"
           >
             写真アップロードページへ
           </button>
-
-          <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-            <li className="mb-2 tracking-[-.01em]">
-              ⚽ Olyble Football Club ⚽
-              <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded"></code>
-            </li>
-            <li className="tracking-[-.01em]">
-              💛 We definitely love football and welcome everyone who loves
-              football 💛
-            </li>
-          </ol>
         </main>
-        <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center text-gray-300">
-          <a href="#" className="flex items-center gap-2 hover:underline">
-            ⚽ Join Our Matches
-          </a>
-          <a href="#" className="flex items-center gap-2 hover:underline">
-            📅 Event Calendar
-          </a>
-          <a href="#" className="flex items-center gap-2 hover:underline">
-            🏆 Club Achievements
-          </a>
+
+        <footer className="row-start-3 flex flex-wrap gap-4 sm:gap-6 justify-center items-center text-gray-300 mt-8">
+          <a href="#" className="hover:underline">⚽ Join Our Matches</a>
+          <a href="#" className="hover:underline">📅 Event Calendar</a>
+          <a href="#" className="hover:underline">🏆 Club Achievements</a>
           <p>Olyble Football Club © {new Date().getFullYear()}</p>
         </footer>
       </div>
-      {/* ボールのアニメーション */}
+
+      {/* ボールアニメーション */}
       {balls.map((b) => {
         if (!buttonRef.current || !goalRef.current) return null;
-
         const buttonRect = buttonRef.current.getBoundingClientRect();
         const goalRect = goalRef.current.getBoundingClientRect();
-
-        const startX = buttonRect.left + buttonRect.width / 2 + window.scrollX;
+        const startX = Math.min(
+          buttonRect.left + buttonRect.width / 2 + window.scrollX,
+          window.innerWidth - b.size
+        );
         const startY = buttonRect.top + buttonRect.height / 2 + window.scrollY;
         const deltaX =
           goalRect.left + goalRect.width / 2 + window.scrollX - startX;
