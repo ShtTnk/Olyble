@@ -236,12 +236,12 @@ export default function Home() {
                 shadow-md"
               onClick={shootBall}
             >
-              ⚽ サッカーボール発射！
+              ⚽ Shoot！
             </button>
 
             {/* ゴール */}
             <div ref={goalRef} className="w-24 h-24">
-              <Image
+              <img
                 src="/soccer_goal.png"
                 className="w-full h-full object-contain"
                 alt="ゴール"
@@ -339,7 +339,7 @@ export default function Home() {
             animate={{ x: deltaX, y: deltaY, rotate: 720, opacity: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
-            <Image src="/soccerball.jpg" className="w-full h-full object-cover" alt="サッカーボール"/>
+            <img src="/soccerball.jpg" className="w-full h-full object-cover" alt="サッカーボール"/>
           </motion.div>
         );
       })}
