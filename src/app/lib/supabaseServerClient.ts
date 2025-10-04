@@ -1,7 +1,9 @@
-// src/app/lib/supabaseServerClient.ts サーバー専用
-import { createClient } from '@supabase/supabase-js'
+// src/app/lib/supabaseServerClient.ts
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseServer = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY! // サーバー用キー
+);
 
-export const supabase = createClient(supabaseUrl, supabaseServiceKey)
+export { supabaseServer };
