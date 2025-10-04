@@ -219,7 +219,7 @@ export default function Home() {
 
           {/* ゴール数の表示 */}
           <p className="text-white text-2xl font-bold mb-4">
-            ゴール数: {goalCount}
+            ゴラッソカウンター: {goalCount}
           </p>
 
           <div className="flex items-center gap-30 justify-end w-full max-w-md mx-auto">
@@ -236,7 +236,7 @@ export default function Home() {
                 shadow-md"
               onClick={shootBall}
             >
-              ⚽ Shoot！
+              ⚽ Shoooooooooot！
             </button>
 
             {/* ゴール */}
@@ -261,6 +261,9 @@ export default function Home() {
             scrolling="auto"
             title="フットサル予約カレンダー"
           />
+          <p className="text-center text-lg sm:text-xl max-w-[700px] leading-6 sm:leading-7 text-yellow-300">
+            📸 オリブルFC所属選手 📸
+          </p>
           <div className="relative w-full max-w-3xl h-[400px] mx-auto overflow-hidden rounded-2xl shadow-lg">
             {images.length > 0 && (
               <AnimatePresence mode="wait">
@@ -271,7 +274,7 @@ export default function Home() {
                   initial={{ opacity: 0, x: 100 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -100 }}
-                  transition={{ duration: 0.8 }}
+                  transition={{ duration: 3.0 }}
                   className="absolute w-full h-full object-cover"
                 />
               </AnimatePresence>
@@ -339,7 +342,11 @@ export default function Home() {
             animate={{ x: deltaX, y: deltaY, rotate: 720, opacity: 0 }}
             transition={{ duration: 1, ease: "easeOut" }}
           >
-            <img src="/soccerball.jpg" className="w-full h-full object-cover" alt="サッカーボール"/>
+            <img
+              src="/soccerball.jpg"
+              className="w-full h-full object-cover"
+              alt="サッカーボール"
+            />
           </motion.div>
         );
       })}
