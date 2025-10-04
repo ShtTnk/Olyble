@@ -8,6 +8,7 @@ import { use, useEffect, useState, useRef } from "react";
 import { SoccerBallRain } from "./components/SoccerBallRain";
 import { supabase } from "@/app/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { div } from "framer-motion/client";
 
 // -------------------------------パーティクル用----------------------------
 const NUM_PARTICLES = 20;
@@ -140,18 +141,18 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [images]);
 
-  // タイトルテキスト
-  const text = " Welcome  to  Olyble  FC  Home !";
+  // タイトルテキストを配列でまとめる
+  const titleParts = ["We", "are", "Olyble FC!"];
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.2, ease: "easeInOut" }}
-      className="absolute inset-0 flex flex-col items-center justify-center text-white"
+      className="absolute inset-0 flex flex-col items-center justify-center text-white bg-black"
     >
       <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-        <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
+        <main className="flex flex-col gap-[32px] row-start-2 items-center">
           <Image
             className="dark:invert"
             src="/next.svg"
@@ -161,23 +162,43 @@ export default function Home() {
             priority
           />
           {/* 🌈 左から順に虹色表示タイトル */}
-          <h1 className="text-4xl sm:text-5xl font-extrabold flex flex-wrap gap-1 mb-10">
-            {text.split("").map((char, index) => (
+          {/* 🌈 虹色アニメーションタイトル */}
+          <h1 className="text-4xl sm:text-5xl font-extrabold flex flex-wrap gap-3 mb-10">
+            {titleParts.map((word, wordIndex) => (
               <motion.span
-                key={index}
-                className={rainbowColors[index % rainbowColors.length]}
-                initial={{ opacity: 0, y: 20 }}
+                key={wordIndex}
+                className="flex"
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  delay: index * 0.05,
-                  duration: 0.4,
+                  delay: wordIndex * 0.4, // 単語ごとに少し遅らせる
+                  duration: 0.6,
                   ease: "easeOut",
                 }}
               >
-                {char}
+                {word.split("").map((char, charIndex) => (
+                  <motion.span
+                    key={charIndex}
+                    className={
+                      rainbowColors[
+                        (wordIndex * 3 + charIndex) % rainbowColors.length
+                      ]
+                    }
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      delay: wordIndex * 0.4 + charIndex * 0.05,
+                      duration: 0.4,
+                      ease: "easeOut",
+                    }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
               </motion.span>
             ))}
           </h1>
+
           <div className="max-w-md mx-auto mt-10">
             <h2 className="text-2xl font-bold mb-5">
               オリブルFCの次のイベント
@@ -228,7 +249,7 @@ export default function Home() {
               className="
                 px-6 py-3 
                 bg-white dark:bg-gray-800 
-                text-black dark:text-white 
+                text-black dark:text-white
                 border-2 border-black dark:border-white 
                 rounded-full 
                 hover:bg-gray-200 dark:hover:bg-gray-700 
@@ -302,7 +323,7 @@ export default function Home() {
             </li>
             <li className="tracking-[-.01em]">
               💛 We definitely love football and welcome everyone who loves
-              football 💛.
+              football 💛
             </li>
           </ol>
         </main>
